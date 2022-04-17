@@ -13,11 +13,11 @@ MODULE_LICENSE("GPL");
 #define IOCTL_NUM2 IOCTL_START_NUM+2
 
 #define PARAM_IOCTL_NUM 'z'
-#define PARAM_GET _IOWR(PARAM_IOCTL_NUM,IOCTL_NUM1,unsigned long)
+#define PARAM_GET _IOWR(PARAM_IOCTL_NUM,IOCTL_NUM1,unsigned long) // 읽기와 쓰기가 가능한 cmd 생성, (매직번호, 구분번호, 데이터 길이)
 #define PARAM_SET _IOWR(PARAM_IOCTL_NUM,IOCTL_NUM2,unsigned long)
 
 static long my_id = 0;
-module_param(my_id,long,0);
+module_param(my_id,long,0); //parameter 값을 커널 모듈에게 전달해주기 (main 함수 실행할때 argc,argv 넘기는 것처럼 insmod할때 값을 지정할 수 있음)
 
 static int simple_param_open(struct inode *inode, struct file *file){
 	printk("simple_param: open\n");
@@ -29,7 +29,9 @@ static int simple_param_release(struct inode *inode,struct file *file){
 	return 0;
 }
 
-static long simple_param_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
+static long simple_param_ioctl(struct file *file, unsigned int cmd, unsigned long arg){ //cmd: 수향할 명령을 구분하기 위해 사용, 
+											//arg: 하나만 넘길수도 있지만 여러개 넘기고 싶을때 주소를 입력해도 됨.
+											//실패시: -1반환, 성공시 음이 아닌 정수 반환
 	printk("simple_param_ioctl Run\n");
 
 	switch(cmd){
