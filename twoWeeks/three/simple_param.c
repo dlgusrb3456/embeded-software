@@ -50,7 +50,7 @@ static long simple_param_ioctl(struct file *file, unsigned int cmd, unsigned lon
 static dev_t dev_num;
 static struct cdev *cd_cdev;
 
-struct file_operations simple_param_fops = {
+struct file_operations simple_param_fops = {		//cdev안의 ops struct 초기화.
 	.open = simple_param_open,
 	.release = simple_param_release,
 	.unlocked_ioctl = simple_param_ioctl,
@@ -59,10 +59,12 @@ struct file_operations simple_param_fops = {
 
 static int __init simple_param_init(void){
 	printk("simple_param: init modules\n");
-	alloc_chrdev_region(&dev_num,0,1,DEV_NAME);
+	alloc_chrdev_region(&dev_num,0,1,DEV_NAME); //dev_num에 매이져 넘버 받고, 마이너 넘버 받는 곳에 0 관습적으로 넣고, 
+						    //마이너 넘버 몇개 받을건지 1개 넣고, /proc/devices에 넣을 디바이스 네임 넣기
+		`				    //Makefile에서 동적 할당된 Major넘버를 받아옴 (Module명과, awk(collumm 검색), /proc/devices등 사용)
 	cd_cdev=cdev_alloc();
 	cdev_init(cd_cdev,&simple_param_fops);
-	cdev_add(cd_cdev,dev_num,1);
+	cdev_add(cd_cdev,dev_num,1);		    //cdev_add를 통해 Device Drivers에 등록
 	return 0;
 }
 
